@@ -156,69 +156,83 @@ def search_chat_history(query):
         return f'Error: {str(e)}'
 
 
-# 工具函数8：查询文档仓库（使用本地模型）
+# 工具函数8：查询 AnythingLLM 文档仓库
 def anythingllm_query(message):
-    """查询文档仓库（使用本地模型）"""
+    """查询 AnythingLLM 文档仓库"""
     try:
         # 从环境变量获取配置
         env_vars = load_env()
-        base_url = env_vars.get('BASE_URL', 'http://localhost:11434/v1')
-        model = env_vars.get('MODEL', 'llama3')
-        api_key = env_vars.get('API_KEY', 'your-api-key-here')
+        api_key = env_vars.get('ANYTHINGLLM_API_KEY', '')
+        workspace_slug = env_vars.get('ANYTHINGLLM_WORKSPACE_SLUG', '')
         
-        # 构建查询提示，模拟文档仓库查询
-        query_prompt = f"""你是一个文档仓库助手，请根据你的知识库回答以下问题：
-        
-问题：{message}
-
-请提供详细的回答。"""
-        
-        # 解析 base_url
-        if base_url.startswith('http://'):
-            host = base_url[7:].split('/')[0]
-            path = '/' + '/'.join(base_url[7:].split('/')[1:]) if len(base_url[7:].split('/')) > 1 else ''
-            conn = http.client.HTTPConnection(host)
-        elif base_url.startswith('https://'):
-            host = base_url[8:].split('/')[0]
-            path = '/' + '/'.join(base_url[8:].split('/')[1:]) if len(base_url[8:].split('/')) > 1 else ''
-            conn = http.client.HTTPSConnection(host)
-        else:
-            return 'Error: Invalid BASE_URL format'
-        
-        # 构建消息
-        messages = [
-            {"role": "system", "content": "你是一个文档仓库助手，专门回答用户关于文档仓库中的信息查询。请使用中文回答。"},
-            {"role": "user", "content": query_prompt}
-        ]
+        # 验证配置
+        if not api_key:
+            return 'Error: ANYTHINGLLM_API_KEY not found in .env file. Please check http://localhost:3001/api/docs/ for documentation.'
+        if not workspace_slug:
+            return 'Error: ANYTHINGLLM_WORKSPACE_SLUG not found in .env file. Please check http://localhost:3001/api/docs/ for documentation.'
         
         # 构建请求数据
         data = {
-            'model': model,
-            'messages': messages,
-            'max_tokens': 1000,
-            'temperature': 0.7
+            'message': message
         }
         
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {api_key}'
-        }
+        # 构建 curl 命令（处理中文编码问题）
+        curl_command = [
+            'curl',
+            '-X', 'POST',
+            f'http://localhost:3001/api/v1/workspace/{workspace_slug}/chat',
+            '-H', f'Authorization: Bearer {api_key}',
+            '-H', 'Content-Type: application/json; charset=utf-8',
+            '-d', json.dumps(data, ensure_ascii=False)
+        ]
         
-        # 发送请求
-        conn.request('POST', f'{path}/chat/completions', json.dumps(data, ensure_ascii=False), headers)
-        response = conn.getresponse()
-        result = response.read().decode('utf-8')
-        conn.close()
+        # 执行 curl 命令
+        result = subprocess.run(
+            curl_command,
+            capture_output=True,
+            text=True,
+            encoding='utf-8'
+        )
+        
+        # 检查执行结果
+        if result.returncode != 0:
+            # 处理 stderr 可能为空或 None 的情况
+            stderr_content = result.stderr.strip() if result.stderr else "No error message"
+            error_msg = f'Error: {stderr_content}'
+            if 'Connection refused' in error_msg:
+                error_msg += '\n提示：请确保 AnythingLLM 服务正在运行，或检查 http://localhost:3001/api/docs/ 文档'
+            elif 'Could not resolve host' in error_msg:
+                error_msg += '\n提示：请检查网络连接或 API 地址是否正确'
+            return error_msg
+        
+        # 检查响应是否为空
+        if not result.stdout:
+            return 'Error: Empty response from AnythingLLM API'
         
         # 解析响应
-        response_data = json.loads(result)
-        if 'choices' in response_data and len(response_data['choices']) > 0:
-            return response_data['choices'][0]['message']['content']
+        try:
+            response_data = json.loads(result.stdout)
+        except json.JSONDecodeError as e:
+            return f'Error parsing JSON response: {str(e)}. Raw response: {result.stdout[:200]}...'
+        
+        # 检查响应格式
+        if 'text' in response_data:
+            return response_data['text']
+        elif 'response' in response_data:
+            # 某些 API 可能使用 'response' 字段
+            return response_data['response']
+        elif 'error' in response_data:
+            error_info = response_data['error']
+            if isinstance(error_info, dict) and 'message' in error_info:
+                return f'Error: {error_info["message"]}'
+            else:
+                return f'Error: {str(error_info)}'
         else:
-            return f'Error: {response_data.get("error", {}).get("message", "Unknown error")}'
+            # 返回原始响应供调试
+            return f'Error: Unexpected response format. Raw response: {result.stdout[:300]}...\n请检查 http://localhost:3001/api/docs/ 文档'
             
     except Exception as e:
-        return f'Error: {str(e)}'
+        return f'Error: {str(e)}. Please check http://localhost:3001/api/docs/ for documentation.'
 
 
 # 工具映射
@@ -352,9 +366,10 @@ def call_llm(prompt, history, env_vars):
         'Authorization': f'Bearer {api_key}'
     }
     
-    # 发送请求
+    # 发送请求（需要将中文内容编码为 UTF-8）
     try:
-        conn.request('POST', f'{path}/chat/completions', json.dumps(data), headers)
+        request_body = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        conn.request('POST', f'{path}/chat/completions', request_body, headers)
         response = conn.getresponse()
         result = response.read().decode('utf-8')
         conn.close()
@@ -364,7 +379,15 @@ def call_llm(prompt, history, env_vars):
         if 'choices' in response_data and len(response_data['choices']) > 0:
             return response_data['choices'][0]['message']['content']
         else:
-            return f'Error: {response_data.get("error", {}).get("message", "Unknown error")}'
+            # 处理错误响应
+            if 'error' in response_data:
+                error_info = response_data['error']
+                if isinstance(error_info, dict) and 'message' in error_info:
+                    return f'Error: {error_info["message"]}'
+                else:
+                    return f'Error: {str(error_info)}'
+            else:
+                return f'Error: Unknown error. Response: {result}'
     except Exception as e:
         return f'Error: {str(e)}'
 

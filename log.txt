@@ -85,3 +85,35 @@
 
 你对哪个方向更感兴趣？或者有什么特别想写的科幻设定吗？我们可以一起深入讨论！
 
+
+=== 2026-04-29 10:26:13 ===
+请从以下聊天历史中提取关键信息，按照5W规则（谁Who、做了什么事What、什么时候When、在何处Where、为什么要做这个事Why）提取多条关键信息：
+
+用户: 你好
+助手: 
+
+你好！我是你的AI助手，可以帮你处理文件管理、网页搜索、历史记录查询和文档仓库检索等任务。  
+有什么具体的事情需要协助吗？比如：  
+- 查看或修改某个目录的文件  
+- 查找之前的聊天记录  
+- 查询文档仓库中的知识信息  
+
+请告诉我需求，我会立即为你提供支持！
+用户: 列出practice05中的文件
+用户: 访问https://wttr.in/成都查询天气
+助手: Error: 'str' object has no attribute 'get'
+用户: 访问https://wttr.in/chengdu查询天气
+助手: Error: 'str' object has no attribute 'get'
+
+
+=== 2026-04-29 10:30:48 ===
+请从以下聊天历史中提取关键信息，按照5W规则（谁Who、做了什么事What、什么时候When、在何处Where、为什么要做这个事Why）提取多条关键信息：
+
+用户: 聊天历史总结
+助手: 
+用户: 查看anythingLLM文档仓库
+用户: 查看anythingLLM文档仓库
+助手: Error: 'str' object has no attribute 'get'
+用户: 查询聊天历史
+助手: Error: 'str' object has no attribute 'get'
+

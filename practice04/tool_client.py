@@ -280,9 +280,10 @@ def call_llm(prompt, history, env_vars):
         'Authorization': f'Bearer {api_key}'
     }
     
-    # 发送请求
+    # 发送请求（需要将中文内容编码为 UTF-8）
     try:
-        conn.request('POST', f'{path}/chat/completions', json.dumps(data), headers)
+        request_body = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        conn.request('POST', f'{path}/chat/completions', request_body, headers)
         response = conn.getresponse()
         result = response.read().decode('utf-8')
         conn.close()
@@ -292,7 +293,15 @@ def call_llm(prompt, history, env_vars):
         if 'choices' in response_data and len(response_data['choices']) > 0:
             return response_data['choices'][0]['message']['content']
         else:
-            return f'Error: {response_data.get("error", {}).get("message", "Unknown error")}'
+            # 处理错误响应
+            if 'error' in response_data:
+                error_info = response_data['error']
+                if isinstance(error_info, dict) and 'message' in error_info:
+                    return f'Error: {error_info["message"]}'
+                else:
+                    return f'Error: {str(error_info)}'
+            else:
+                return f'Error: Unknown error. Response: {result}'
     except Exception as e:
         return f'Error: {str(e)}'
 

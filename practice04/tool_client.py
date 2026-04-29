@@ -22,9 +22,18 @@ def load_env():
 def list_files(directory):
     """列出某个目录下有哪些文件（包括文件的基本属性、大小等信息）"""
     try:
+        # 将相对路径转换为绝对路径
+        abs_directory = os.path.abspath(directory)
+        
+        if not os.path.exists(abs_directory):
+            return f'Error: Directory {directory} does not exist'
+        
+        if not os.path.isdir(abs_directory):
+            return f'Error: {directory} is not a directory'
+        
         files = []
-        for item in os.listdir(directory):
-            item_path = os.path.join(directory, item)
+        for item in os.listdir(abs_directory):
+            item_path = os.path.join(abs_directory, item)
             if os.path.isfile(item_path):
                 stat = os.stat(item_path)
                 files.append({

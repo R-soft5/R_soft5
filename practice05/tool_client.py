@@ -23,9 +23,18 @@ def load_env():
 def list_files(directory):
     """列出某个目录下有哪些文件（包括文件的基本属性、大小等信息）"""
     try:
+        # 将相对路径转换为绝对路径
+        abs_directory = os.path.abspath(directory)
+        
+        if not os.path.exists(abs_directory):
+            return f'Error: Directory {directory} does not exist'
+        
+        if not os.path.isdir(abs_directory):
+            return f'Error: {directory} is not a directory'
+        
         files = []
-        for item in os.listdir(directory):
-            item_path = os.path.join(directory, item)
+        for item in os.listdir(abs_directory):
+            item_path = os.path.join(abs_directory, item)
             if os.path.isfile(item_path):
                 stat = os.stat(item_path)
                 files.append({
@@ -509,14 +518,26 @@ def main():
                 response = call_llm(user_input, history, env_vars)
                 print(response)
                 
-                # 检查是否包含工具调用
-                if response.strip().startswith('{') and 'tool_call' in response:
-                    # 处理工具调用
-                    tool_result = process_tool_call(response)
-                    print('Tool Result: ', tool_result)
-                    
-                    # 添加到历史记录
-                    history.append({"user": user_input, "tool_call": json.loads(response), "tool_result": tool_result})
+                # 检查是否包含工具调用（处理可能包含的反引号标记）
+                response_clean = response.strip()
+                if '```json' in response_clean:
+                    # 提取JSON内容
+                    start_idx = response_clean.find('{')
+                    end_idx = response_clean.rfind('}') + 1
+                    if start_idx != -1 and end_idx != -1:
+                        response_clean = response_clean[start_idx:end_idx]
+                
+                if response_clean.startswith('{') and 'tool_call' in response_clean:
+                    try:
+                        # 处理工具调用
+                        tool_result = process_tool_call(response_clean)
+                        print('Tool Result: ', tool_result)
+                        
+                        # 添加到历史记录
+                        history.append({"user": user_input, "tool_call": json.loads(response_clean), "tool_result": tool_result})
+                    except json.JSONDecodeError as e:
+                        print(f'Error parsing tool call: {e}')
+                        history.append({"user": user_input, "assistant": response})
                 else:
                     # 添加到历史记录
                     history.append({"user": user_input, "assistant": response})

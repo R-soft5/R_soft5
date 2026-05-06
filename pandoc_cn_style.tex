@@ -1,0 +1,73 @@
+% Pandoc PDF style for Chinese survey reports
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{etoolbox}
+
+% Font families: SimSun for Chinese, Times New Roman for English
+\newCJKfontfamily\fontsongti{SimSun}
+\setmainfont{Times New Roman}
+\setCJKmainfont{SimSun}
+
+% Body text: Songti (SimSun), size 小四 (12pt), fixed leading 18pt
+\AtBeginDocument{\fontsize{12pt}{18pt}\selectfont}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+% Keep metadata title only for header; do not print a separate maketitle block
+\AtBeginDocument{\let\maketitle\relax}
+
+% Tables: Songti (SimSun), size 小四 (12pt), single line spacing
+\AtBeginEnvironment{tabular}{\fontsize{12pt}{14pt}\selectfont\renewcommand{\arraystretch}{1}}
+\AtBeginEnvironment{longtable}{\fontsize{12pt}{14pt}\selectfont\renewcommand{\arraystretch}{1}}
+
+% Heading styles:
+% #      -> total title: Songti Bold, size 18pt
+% ##     -> level-1 title: Songti Bold, size 16pt
+% ###    -> level-2 title: Songti, size 14pt
+% ####   -> level-3 title: Songti bold, size 12pt
+\titleformat{\section}
+  {\centering\bfseries\fontsize{18pt}{24pt}\selectfont}
+  {\thesection}{0.8em}{}
+\titleformat{\subsection}
+  {\bfseries\fontsize{16pt}{22pt}\selectfont}
+  {\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}
+  {\fontsize{14pt}{20pt}\selectfont}
+  {\thesubsubsection}{0.6em}{}
+\titleformat{\paragraph}[hang]
+  {\bfseries\fontsize{12pt}{18pt}\selectfont}
+  {\theparagraph}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{12pt}{12pt}
+\titlespacing*{\subsection}{0pt}{10pt}{8pt}
+\titlespacing*{\subsubsection}{0pt}{8pt}{6pt}
+\titlespacing*{\paragraph}{0pt}{6pt}{4pt}
+
+% Footer only: centered page numbers, no header rule
+\pagestyle{plain}
+\raggedbottom
+\makeatletter
+\let\ps@plain\ps@empty
+\makeatother
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% Keep inserted figures tidy and attached to their captions
+\floatplacement{figure}{htbp}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\setkeys{Gin}{width=0.9\linewidth,keepaspectratio}
+\captionsetup[figure]{font={small},justification=centering,singlelinecheck=false,skip=6pt}

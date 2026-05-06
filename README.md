@@ -6,13 +6,24 @@
 ├── .gitignore          # Git忽略文件配置
 ├── env.example         # 环境变量配置模板
 ├── venv/               # 虚拟环境目录
+├── .agents/
+│   └── skills/         # 技能目录
+│       └── notice/    # 通知撰写技能
+│           └── SKILL.md
 ├── practice01/         # 第一个练习目录
 │   ├── llm_client.py   # 基础LLM客户端实现
 │   └── chat_client.py  # 交互式聊天客户端实现
 ├── practice02/         # 第二个练习目录
 │   └── tool_client.py  # 工具调用客户端实现
-└── practice03/         # 第三个练习目录
-    └── tool_client.py  # 工具调用客户端实现（含网络访问功能）
+├── practice03/         # 第三个练习目录
+│   └── tool_client.py  # 工具调用客户端实现（含网络访问功能）
+├── practice04/         # 第四个练习目录
+│   └── tool_client.py  # 工具调用客户端实现（含聊天历史管理功能）
+├── practice05/         # 第五个练习目录
+│   ├── tool_client.py  # 工具调用客户端实现（含AnythingLLM集成）
+│   └── chat_client.py  # 交互式聊天客户端实现
+└── practice06/         # 第六个练习目录
+    └── tool_client.py  # 技能系统客户端实现
 ```
 
 ## 代码功能说明
@@ -76,6 +87,23 @@
   - 系统提示词更新
   - 内容长度限制处理
 
+### practice06/tool_client.py
+- **功能**：
+  1. 实现技能系统，支持动态加载和执行技能
+  2. `list_available_skills()` 函数：读取 `.agents/skills` 目录下所有技能的 SKILL.md 文件，解析 YAML front matter 中的 name 和 description 字段
+  3. `load_skill_content(skill_name)` 函数：加载指定技能的完整内容（YAML front matter 之后的部分）
+  4. `is_notice_request(user_input)` 函数：智能检测用户是否请求撰写通知
+  5. 将技能列表以 JSON 格式通过 system prompt 发送给 LLM
+  6. 当检测到通知请求时，自动加载 notice 技能内容并发送给 LLM
+  7. 支持两种运行模式：自动测试模式和交互模式
+- **技术点**：
+  - YAML front matter 解析（使用正则表达式）
+  - 动态目录扫描和技能发现
+  - 技能系统与 LLM 的集成
+  - System prompt 动态构建
+  - 智能技能检测与自动加载
+  - 多模式运行（自动测试/交互）
+
 ## 教学目标
 
 1. **环境配置**：
@@ -116,6 +144,13 @@
    - 理解HTTP/HTTPS协议的基本原理
    - 掌握网页内容获取与处理方法
    - 学习如何将网络访问能力集成到工具调用系统中
+
+8. **技能系统**：
+   - 学习如何设计和实现技能（Skill）结构
+   - 理解 YAML front matter 的解析方法
+   - 掌握技能列表的动态发现机制
+   - 学习如何通过 system prompt 向 LLM 传递技能信息
+   - 理解技能调用流程和上下文管理
 
 ## 运行方法
 
@@ -161,15 +196,30 @@
    - 观察LLM生成工具调用请求并执行
    - 按Ctrl+C退出客户端
 
+7. 运行技能系统客户端（practice06）：
+   ```bash
+   python practice06/tool_client.py
+   ```
+   - 程序提供两种运行模式：
+     - 选项1（自动测试）：自动测试两个场景
+       - 测试1：撰写五一节放假通知（未指定部门）→ 应输出"XX部通知"
+       - 测试2：撰写五一节放假通知（销售部）→ 应输出"销售部通知"
+     - 选项2（交互模式）：用户输入部门名称生成通知
+   - 观察 LLM 如何自动调用 notice 技能并生成正确格式的通知
+
 ## 扩展建议
 
 - 尝试集成不同的LLM服务（如OpenAI、Anthropic、本地部署的模型等）
 - 实现更复杂的对话管理功能
 - 添加错误重试机制和超时处理
 - 构建简单的命令行界面或Web界面
+- 添加更多技能（如代码审查、数据分析等）
+- 实现技能的参数化调用
 
 ## 注意事项
 
 - 请不要将包含真实API密钥的.env文件提交到版本控制系统
 - 确保LLM服务已正确配置并运行
 - 根据不同LLM服务的要求调整API参数
+- 技能目录结构：`.agents/skills/<skill-name>/SKILL.md`
+- SKILL.md 文件必须包含有效的 YAML front matter

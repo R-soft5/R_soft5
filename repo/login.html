@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>溢心捐赠平台 - 捐赠者登录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fa fa-heart-o"></i> 溢心捐赠平台
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="index.html" class="nav-link">返回首页</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card login-card">
+            <div class="card-header bg-danger text-white text-center">
+                <h4 class="mb-0"><i class="fa fa-user"></i> 捐赠者登录</h4>
+            </div>
+            <div class="card-body p-4">
+                <form id="donorLoginForm">
+                    <div class="mb-3">
+                        <label for="donorPhone" class="form-label">手机号</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-mobile"></i></span>
+                            <input type="tel" class="form-control" id="donorPhone" placeholder="请输入手机号" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="donorPwd" class="form-label">密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                            <input type="password" class="form-control" id="donorPwd" placeholder="请输入密码" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">自动登录（7天内有效）</label>
+                    </div>
+                    <button type="submit" class="btn donate-btn w-100">登录</button>
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-muted small">忘记密码？</a> | 
+                        <a href="register.html" class="text-danger small">注册账号</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center text-muted">
+                <p class="mb-0">还没有账号？<a href="register.html" class="text-danger">立即注册</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="login-check.js"></script>
+    <script>
+        document.getElementById('donorLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const phone = document.getElementById('donorPhone').value;
+            const pwd = document.getElementById('donorPwd').value;
+            
+            if (!phone || !pwd) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            // 保存登录状态
+            const loginData = {
+                userId: 'DON' + Date.now().toString().slice(-6),
+                phone: phone,
+                userType: 'donor',
+                loginTime: new Date().toISOString(),
+                isLoggedIn: true
+            };
+            
+            // 根据"记住我"选项选择存储方式
+            if (document.getElementById('rememberMe').checked) {
+                localStorage.setItem('userToken', JSON.stringify(loginData));
+            } else {
+                sessionStorage.setItem('userToken', JSON.stringify(loginData));
+            }
+            
+            // 检查重定向参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect') || 'index.html';
+            const donationId = urlParams.get('donationId');
+
+            if (redirectUrl === 'donor-dashboard.html' && donationId) {
+                window.location.href = `donation-usage.html?donationId=${donationId}`;
+            } else {
+                window.location.href = redirectUrl;
+            }
+        });
+    </script>
+</body>
+</html>

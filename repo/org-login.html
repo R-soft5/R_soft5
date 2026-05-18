@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>溢心捐赠平台 - 机构登录</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fa fa-heart-o"></i> 溢心捐赠平台
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="index.html" class="nav-link">返回首页</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card login-card">
+            <div class="card-header bg-danger text-white text-center">
+                <h4 class="mb-0"><i class="fa fa-building"></i> 机构登录</h4>
+            </div>
+            <div class="card-body p-4">
+                <form id="orgLoginForm">
+                    <div class="mb-3">
+                        <label for="orgCode" class="form-label">机构编号</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-id-card"></i></span>
+                            <input type="text" class="form-control" id="orgCode" placeholder="请输入机构编号" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgPhone" class="form-label">负责人手机号</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-mobile"></i></span>
+                            <input type="tel" class="form-control" id="orgPhone" placeholder="请输入负责人手机号" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgPwd" class="form-label">密码</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                            <input type="password" class="form-control" id="orgPwd" placeholder="请输入密码" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn donate-btn w-100">登录</button>
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-muted small">忘记密码？</a> | 
+                        <a href="register.html" class="text-danger small">注册机构账号</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center text-muted">
+                <p class="mb-0">还没有机构账号？<a href="register.html" class="text-danger">立即注册</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="login-check.js"></script>
+    <script>
+        document.getElementById('orgLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = document.getElementById('orgCode').value;
+            const phone = document.getElementById('orgPhone').value;
+            const pwd = document.getElementById('orgPwd').value;
+            
+            if (!code || !phone || !pwd) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            // 保存登录状态
+            const loginData = {
+                orgId: code,
+                phone: phone,
+                userType: 'org',
+                orgName: '公益机构演示',
+                loginTime: new Date().toISOString(),
+                isLoggedIn: true
+            };
+            
+            localStorage.setItem('userToken', JSON.stringify(loginData));
+            
+            alert('机构登录成功！');
+            window.location.href = 'org-dashboard.html';
+        });
+    </script>
+</body>
+</html>

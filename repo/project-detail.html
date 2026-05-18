@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>溢心捐赠平台 - 项目详情</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .project-progress { height: 12px; }
+        .amount-btn.active { background-color: #e74c3c !important; color: white !important; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fa fa-heart-o"></i> 溢心捐赠平台
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="index.html" class="nav-link">返回首页</a>
+                <span class="nav-link" id="userInfo" style="display: none;"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row">
+            <!-- 项目信息 -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <img src="https://picsum.photos/800/400?random=1" class="card-img-top" id="projectCover">
+                    <div class="card-body">
+                        <h2 class="card-title fw-bold" id="projectName">乡村教育助学计划</h2>
+                        <p class="text-muted mb-3" id="orgName">机构：中国乡村发展基金会</p>
+                        
+                        <!-- 筹款进度 -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold">筹款进度</span>
+                                <span id="progressText">75% (¥750,000 / ¥1,000,000)</span>
+                            </div>
+                            <div class="progress project-progress mb-2">
+                                <div class="progress-bar bg-danger" id="progressBar" 
+                                     role="progressbar" style="width: 75%" 
+                                     aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>剩余天数：30天</span>
+                                <span>捐赠人数：12589人</span>
+                            </div>
+                        </div>
+
+                        <!-- 项目介绍 -->
+                        <h4 class="mt-4">项目介绍</h4>
+                        <p id="projectDescription" class="card-text">
+                            乡村教育助学计划旨在改善乡村留守儿童的教育条件，为偏远地区学校提供学习用品、课外书籍、多媒体教学设备，并招募志愿者教师开展支教活动。
+                        </p>
+                        <h4 class="mt-4">资金用途</h4>
+                        <ul class="list-unstyled" id="fundUsage">
+                            <li><i class="fa fa-check text-danger me-2"></i> 学习用品采购：40%</li>
+                            <li><i class="fa fa-check text-danger me-2"></i> 师资培训：25%</li>
+                            <li><i class="fa fa-check text-danger me-2"></i> 教学设备购置：20%</li>
+                            <li><i class="fa fa-check text-danger me-2"></i> 项目执行与管理：15%</li>
+                        </ul>
+                        
+                        <!-- 捐款去向查询说明 -->
+                        <div class="alert alert-info mt-4">
+                            <p class="mb-2"><i class="fa fa-info-circle"></i> 捐赠成功后，你可以在"我的捐赠"页面查询每笔捐款的去向。</p>
+                            <p class="mb-0">我们会定期公示资金使用情况，确保你的善款透明、高效地使用。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 捐赠表单 -->
+            <div class="col-md-4">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header bg-danger text-white text-center">
+                        <h5 class="mb-0"><i class="fa fa-heart"></i> 我要捐赠</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="donateForm">
+                            <!-- 捐赠金额选择 -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">选择捐赠金额</label>
+                                <div class="d-flex flex-wrap gap-2 mb-3" id="amountButtons">
+                                    <button type="button" class="btn btn-outline-danger amount-btn" data-amount="10">¥10</button>
+                                    <button type="button" class="btn btn-outline-danger amount-btn" data-amount="50">¥50</button>
+                                    <button type="button" class="btn btn-outline-danger amount-btn" data-amount="100">¥100</button>
+                                    <button type="button" class="btn btn-outline-danger amount-btn" data-amount="200">¥200</button>
+                                    <button type="button" class="btn btn-outline-danger amount-btn" data-amount="500">¥500</button>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text">¥</span>
+                                    <input type="number" class="form-control" id="customAmount" placeholder="自定义金额" min="1">
+                                </div>
+                            </div>
+
+                            <!-- 捐赠方式 -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">捐赠方式</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="donateType" id="oneTimeDonate" checked>
+                                    <label class="form-check-label" for="oneTimeDonate">单次捐赠</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="donateType" id="monthDonate">
+                                    <label class="form-check-label" for="monthDonate">每月定期捐赠</label>
+                                </div>
+                            </div>
+
+                            <!-- 匿名捐赠 -->
+                            <div class="mb-4 form-check">
+                                <input type="checkbox" class="form-check-input" id="anonymousDonate">
+                                <label class="form-check-label" for="anonymousDonate">匿名捐赠（隐藏我的姓名）</label>
+                            </div>
+
+                            <!-- 留言 -->
+                            <div class="mb-4">
+                                <label class="form-label">爱心留言（选填）</label>
+                                <textarea class="form-control" id="donateMsg" rows="2" placeholder="写下你的祝福..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn donate-btn w-100" id="donateButton">
+                                <i class="fa fa-heart"></i> 确认捐赠
+                            </button>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">捐赠前请确保已登录</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>© 2026 溢心捐赠平台 版权所有 | 公益备案号：XXX-XXXX-XXXX</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="login-check.js"></script>
+    <script>
+        // 从URL参数获取项目信息
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 项目数据
+        const projectData = {
+            1: {
+                title: "乡村教育助学计划",
+                org: "中国乡村发展基金会",
+                description: "乡村教育助学计划旨在改善乡村留守儿童的教育条件，为偏远地区学校提供学习用品、课外书籍、多媒体教学设备，并招募志愿者教师开展支教活动。截至目前，我们已为全国20个省份的100所乡村小学提供了物资支持，帮助超过5000名留守儿童改善了学习环境。",
+                progress: 75,
+                raised: 750000,
+                target: 1000000,
+                cover: "https://picsum.photos/800/400?random=1"
+            },
+            2: {
+                title: "大病医疗救助项目",
+                org: "中国残疾人福利基金会",
+                description: "为困难家庭大病患者提供医疗费用补贴，帮助他们渡过难关。项目已累计帮助超过1000个家庭，资助金额超过500万元。",
+                progress: 60,
+                raised: 600000,
+                target: 1000000,
+                cover: "https://picsum.photos/800/400?random=2"
+            },
+            3: {
+                title: "灾区物资援助计划",
+                org: "中国红十字会",
+                description: "为受灾地区提供食品、饮用水、帐篷等应急物资，支援灾后重建。在最近的几次自然灾害中，我们及时为灾区送去了急需的物资。",
+                progress: 85,
+                raised: 850000,
+                target: 1000000,
+                cover: "https://picsum.photos/800/400?random=3"
+            }
+        };
+
+        // 页面初始化
+        window.onload = function() {
+            const projectId = getUrlParam('id') || 1;
+            const project = projectData[projectId];
+            
+            if (project) {
+                document.getElementById('projectName').textContent = project.title;
+                document.getElementById('orgName').textContent = '机构：' + project.org;
+                document.getElementById('projectDescription').textContent = project.description;
+                document.getElementById('projectCover').src = project.cover;
+                
+                document.getElementById('progressBar').style.width = project.progress + '%';
+                document.getElementById('progressBar').setAttribute('aria-valuenow', project.progress);
+                document.getElementById('progressText').textContent = 
+                    `${project.progress}% (¥${project.raised.toLocaleString()} / ¥${project.target.toLocaleString()})`;
+            }
+            
+            // 检查登录状态
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('userInfo').textContent = 
+                    user.userType === 'donor' ? `捐赠者：${user.phone}` : `机构：${user.orgName}`;
+            }
+        };
+
+        // 选择捐赠金额
+        let selectedAmount = 0;
+        const amountButtons = document.querySelectorAll('.amount-btn');
+        
+        amountButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 移除所有按钮的active类
+                amountButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('btn-danger', 'text-white');
+                    btn.classList.add('btn-outline-danger');
+                });
+                
+                // 添加当前按钮的active类
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('active');
+                
+                selectedAmount = parseFloat(this.getAttribute('data-amount'));
+                document.getElementById('customAmount').value = '';
+            });
+        });
+
+        // 监听自定义金额输入
+        document.getElementById('customAmount').addEventListener('input', function() {
+            selectedAmount = this.value ? Number(this.value) : 0;
+            
+            // 移除固定金额按钮的选中状态
+            amountButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('btn-danger', 'text-white');
+                btn.classList.add('btn-outline-danger');
+            });
+        });
+
+        // 提交捐赠
+        document.getElementById('donateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const finalAmount = selectedAmount || Number(document.getElementById('customAmount').value);
+            
+            if (!finalAmount || finalAmount < 1) {
+                alert('请选择或输入有效的捐赠金额（最低1元）');
+                return;
+            }
+            
+            const projectName = document.getElementById('projectName').textContent;
+            const projectId = getUrlParam('id') || 1;
+            
+            // 检查登录状态
+            if (!isLoggedIn()) {
+                const confirmLogin = confirm('请先登录后才能完成捐赠。\n点击"确定"跳转到登录页');
+                
+                if (confirmLogin) {
+                    // 保存捐赠信息，登录后恢复
+                    const donationInfo = {
+                        projectName: projectName,
+                        projectId: projectId,
+                        amount: finalAmount,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('pendingDonation', JSON.stringify(donationInfo));
+                    
+                    // 跳转到登录页
+                    window.location.href = `login.html?redirect=project-detail.html&id=${projectId}&donationAmount=${finalAmount}`;
+                }
+                return;
+            }
+            
+            // 生成捐赠记录
+            const donationId = 'DON' + Date.now().toString().slice(-8);
+            const orderNo = donationId;
+            
+            // 捐赠成功提示
+            const userChoice = confirm(`
+                捐赠成功！
+                项目：${projectName}
+                金额：¥${finalAmount}
+                捐赠编号：${orderNo}
+                
+                点击"确定"查询捐赠去向
+                点击"取消"返回首页
+            `);
+            
+            if (userChoice) {
+                // 保存捐赠记录
+                const user = getCurrentUser();
+                const donationRecord = {
+                    id: donationId,
+                    orderNo: orderNo,
+                    donorId: user.userId,
+                    projectId: projectId,
+                    projectTitle: projectName,
+                    amount: finalAmount,
+                    date: new Date().toLocaleString(),
+                    status: 'paid'
+                };
+                
+                // 保存到localStorage
+                let donations = JSON.parse(localStorage.getItem('donations') || '[]');
+                donations.push(donationRecord);
+                localStorage.setItem('donations', JSON.stringify(donations));
+                
+                // 跳转到捐赠去向页面
+                window.location.href = `donation-success.html?donationId=${donationId}&project=${encodeURIComponent(projectName)}&amount=${finalAmount}`;
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -223,10 +223,13 @@ def anythingllm_query(message):
             return response_data['response']
         elif 'error' in response_data:
             error_info = response_data['error']
-            if isinstance(error_info, dict) and 'message' in error_info:
+            if error_info is None:
+                # API返回了error字段但值为null，可能是服务端问题
+                return f'Error: API returned null error. Raw response: {result.stdout[:300]}...\n提示：请检查 AnythingLLM 服务是否正常运行，或查看服务器日志。'
+            elif isinstance(error_info, dict) and 'message' in error_info:
                 return f'Error: {error_info["message"]}'
             else:
-                return f'Error: {str(error_info)}'
+                return f'Error: {str(error_info)}. Raw response: {result.stdout[:300]}...'
         else:
             # 返回原始响应供调试
             return f'Error: Unexpected response format. Raw response: {result.stdout[:300]}...\n请检查 http://localhost:3001/api/docs/ 文档'

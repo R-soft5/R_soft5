@@ -112,8 +112,5 @@
 用户: 聊天历史总结
 助手: 
 用户: 查看anythingLLM文档仓库
-用户: 查看anythingLLM文档仓库
-助手: Error: 'str' object has no attribute 'get'
-用户: 查询聊天历史
-助手: Error: 'str' object has no attribute 'get'
+
 
